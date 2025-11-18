@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuários</title>
+<style>
+body { background:#111; color:white; font-family:Arial; padding:20px; }
+.user-box { background:#222; padding:10px; margin:10px 0; border-radius:8px; }
+button { padding:6px 12px; background:#444; border:none; color:white; border-radius:6px; cursor:pointer; }
+button:hover { background:#666; }
+</style>
+</head>
+<body>
+
+<h1>Painel de Usuários</h1>
+<a href="/" style="color:#0bf;">Voltar</a>
+<hr>
+
+{% for u in users %}
+<div class="user-box">
+<strong>{{ u.username }}</strong> — {{ u.name }}  
+<br>Admin: {{ "Sim" if u.is_admin else "Não" }}
+
+{% if u.username != "migfau" %}
+<br>
+<a href="/toggle_admin/{{ u.username }}">
+    <button>Alternar Admin</button>
+</a>
+{% endif %}
+</div>
+
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Loja do Migfau</title>
+
+<style>
+body { 
+    font-family: Arial; 
+    margin:0; 
+    background:#121212; 
+    color:#e0e0e0;
+    overflow-x: hidden;
+}
+
+h1,h2 { 
+    text-align:center; 
+    color:#fff; 
+}
+
+.products { 
+    display:flex; 
+    flex-wrap:wrap; 
+    gap:15px; 
+    justify-content:center; 
+    padding:20px;
+}
+
+.product { 
+    background:#1e1e1e; 
+    padding:10px; 
+    width:220px; 
+    border-radius:10px; 
+    box-shadow:0 0 10px #0008; 
+    text-align:center; 
+}
+
+.product img { 
+    width:100%; 
+    height:150px; 
+    object-fit:cover; 
+    border-radius:8px; 
+}
+
+.comment-form, 
+.comments-box, 
+.admin-box { 
+    max-width:500px; 
+    margin:25px auto; 
+    background:#1e1e1e; 
+    padding:15px; 
+    border-radius:10px; 
+    box-shadow:0 0 10px #0008; 
+}
+
+.comment { 
+    background:#2a2a2a; 
+    padding:10px; 
+    border-radius:8px; 
+    margin-bottom:10px; 
+    border-left:4px solid #007bff; 
+}
+
+input, textarea { 
+    width:100%; 
+    padding:8px; 
+    margin:5px 0; 
+    border-radius:8px; 
+    border:1px solid #333; 
+    background:#2a2a2a; 
+    color:#eee; 
+}
+
+textarea { resize:none; }
+
+button { 
+    padding:10px 15px; 
+    border:none; 
+    border-radius:8px; 
+    background:#333; 
+    color:white; 
+    cursor:pointer; 
+    margin-top:5px; 
+    transition:0.2s; 
+}
+button:hover { background:#444; }
+
+.logout-btn { 
+    display:block; 
+    text-align:center; 
+    margin:15px auto; 
+    color:#ff5757; 
+}
+
+/* MOBILE */
+@media (max-width:600px) {
+    .product, .comment, .admin-box { 
+        width:100% !important; 
+        margin:10px 0 !important; 
+    }
+    img { 
+        width:100% !important; 
+        height:auto !important; 
+        display:block; 
+    }
+}
+</style>
+
+</head>
+<body>
+
+<h1>Loja do Migfau 😎🔥</h1>
+
+<!-- LOGIN / REGISTER -->
+
+{% if not logged_in %}
+<div class="admin-box">
+    <h2>Login / Criar Conta</h2>
+
+    <!-- LOGIN -->
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Usuário" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <br>
+
+    <!-- REGISTER -->
+    <form action="/register" method="POST">
+        <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="text" name="username" placeholder="Usuário" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <button type="submit">Criar Conta</button>
+    </form>
+</div>
+{% endif %}
+
+
+<!-- ADMIN ADD PRODUCT -->
+
+{% if logged_in and is_admin %}
+<div class="admin-box">
+    <h2>Adicionar Produto</h2>
+
+    <form action="/add_product" method="POST" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Nome do produto" required>
+        <input type="text" name="desc" placeholder="Descrição" required>
+        <input type="file" name="image" required>
+        <button type="submit">Postar</button>
+    </form>
+
+    <a class="logout-btn" href="/logout">Sair da conta</a>
+
+    <a href="/users" style="text-align:center;display:block;margin-top:15px;color:#6bf;">
+        Painel de Usuários
+    </a>
+</div>
+
+{% elif logged_in %}
+<a class="logout-btn" href="/logout">Sair da conta</a>
+{% endif %}
+
+
+<!-- PRODUCTS -->
+
+<h2>Produtos</h2>
+<div class="products">
+{% for p in products %}
+<div class="product">
+    <img src="{{ p.image }}" alt="produto">
+    <h3>{{ p.name }}</h3>
+    <p>{{ p.desc }}</p>
+
+    {% if logged_in and is_admin %}
+    <a href="/remove_product/{{ loop.index0 }}">
+        <button style="background:#880000;">Remover</button>
+    </a>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
+
+
+<!-- COMMENTS -->
+
+<h2>Comentários</h2>
+
+{% if logged_in %}
+<div class="comment-form">
+    <form action="/comment" method="POST">
+        <textarea name="text" placeholder="Seu comentário" required></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+{% else %}
+<p style="text-align:center;">Crie uma conta ou faça login para comentar!</p>
+{% endif %}
+
+<div class="comments-box">
+{% for c in comments %}
+<div class="comment">
+    <strong>{{ c.name }}</strong>
+    <p>{{ c.text }}</p>
+
+    {% if logged_in and is_admin %}
+    <a href="/remove_comment/{{ loop.index0 }}">
+        <button style="background:#880000;margin-top:5px;">Excluir</button>
+    </a>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
+
+</body>
+</html>
